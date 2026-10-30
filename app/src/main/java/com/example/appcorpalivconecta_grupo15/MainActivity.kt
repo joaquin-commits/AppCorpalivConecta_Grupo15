@@ -5,10 +5,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 
-// Importamos la pantalla adaptable
-import com.example.appcorpalivconecta_grupo15.ui.screens.HomeScreen2
+// Sistema de navegación de la Guía 10
+import com.example.appcorpalivconecta_grupo15.navigation.AppNavigation
 
-// Importamos el tema visual de CORPALIV Conecta
+// Tema visual de CORPALIV Conecta
 import com.example.appcorpalivconecta_grupo15.ui.theme.AppCorpalivConecta_Grupo15Theme
 
 class MainActivity : ComponentActivity() {
@@ -16,14 +16,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Establecemos la interfaz con Jetpack Compose
         setContent {
 
-            // Aplicamos el tema visual
             AppCorpalivConecta_Grupo15Theme {
 
-                // Selecciona la pantalla según el tamaño
-                HomeScreen2()
+                // Navegación principal de la aplicación
+                AppNavigation()
+
             }
         }
     }

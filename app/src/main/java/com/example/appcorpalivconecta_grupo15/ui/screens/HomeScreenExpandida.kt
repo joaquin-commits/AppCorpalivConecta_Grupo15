@@ -1,4 +1,5 @@
 
+
 package com.example.appcorpalivconecta_grupo15.ui.screens
 
 // Componentes para organizar la interfaz
@@ -29,20 +30,11 @@ import com.example.appcorpalivconecta_grupo15.R
 // Tema visual de CORPALIV Conecta
 import com.example.appcorpalivconecta_grupo15.ui.theme.AppCorpalivConecta_Grupo15Theme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreenExpandida() {
 
-    // Estructura principal de la pantalla
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text("CORPALIV Conecta")
-                }
-            )
-        }
-    ) { innerPadding ->
+    // Estructura principal sin barra superior duplicada
+    Scaffold { innerPadding ->
 
         // Contenedor que ocupa el espacio disponible
         Box(

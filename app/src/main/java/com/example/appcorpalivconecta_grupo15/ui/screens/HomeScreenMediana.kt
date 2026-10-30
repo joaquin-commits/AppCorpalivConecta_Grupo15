@@ -29,18 +29,11 @@ import com.example.appcorpalivconecta_grupo15.R
 // Tema de la aplicación
 import com.example.appcorpalivconecta_grupo15.ui.theme.AppCorpalivConecta_Grupo15Theme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreenMediana() {
 
-    // Estructura principal de la pantalla
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("CORPALIV Conecta") }
-            )
-        }
-    ) { innerPadding ->
+    // Estructura principal sin barra superior duplicada
+    Scaffold { innerPadding ->
 
         // Fila: contenido a la izquierda e imagen a la derecha
         Row(

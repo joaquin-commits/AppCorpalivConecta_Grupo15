@@ -28,21 +28,11 @@ import com.example.appcorpalivconecta_grupo15.R
 // Tema visual de CORPALIV Conecta
 import com.example.appcorpalivconecta_grupo15.ui.theme.AppCorpalivConecta_Grupo15Theme
 
-// Permite utilizar TopAppBar
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreenCompacta() {
 
-    // Estructura principal de la pantalla
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text("CORPALIV Conecta")
-                }
-            )
-        }
-    ) { innerPadding ->
+    // Estructura principal sin barra superior duplicada
+    Scaffold { innerPadding ->
 
         // Organización vertical para pantallas pequeñas
         Column(

@@ -41,8 +41,13 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
 
-
+    // Guía 9: Tamaños de ventana
     implementation("androidx.compose.material3:material3-window-size-class")
+    // Guía 10: Navegación entre pantallas
+    implementation("androidx.navigation:navigation-compose:2.9.7")
+
+    // Guía 10: Íconos para los menús
+    implementation("androidx.compose.material:material-icons-extended")
 
 
     implementation(libs.androidx.compose.ui)
