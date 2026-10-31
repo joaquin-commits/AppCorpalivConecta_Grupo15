@@ -7,14 +7,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 
-// Componentes visuales de Material Design 3
+// Material Design 3
 import androidx.compose.material3.*
 
-// Iconos para los menus
+// Iconos de navegacion
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.CheckCircle
 
 // Organizacion de la interfaz
 import androidx.compose.foundation.layout.*
@@ -32,7 +33,7 @@ import androidx.navigation.navArgument
 // ViewModel de Jetpack
 import androidx.lifecycle.viewmodel.compose.viewModel
 
-// Corrutinas para abrir y cerrar el menu
+// Corrutinas
 import kotlinx.coroutines.launch
 
 // Pantallas de las Guias 9 y 10
@@ -44,9 +45,13 @@ import com.example.appcorpalivconecta_grupo15.ui.screens.DetailScreen
 import com.example.appcorpalivconecta_grupo15.ui.screens.RegistroScreen
 import com.example.appcorpalivconecta_grupo15.ui.screens.ResumenScreen
 
-// ViewModels de la aplicacion
+// Pantalla de la Guia 12
+import com.example.appcorpalivconecta_grupo15.ui.screens.EstadoScreen
+
+// ViewModels
 import com.example.appcorpalivconecta_grupo15.viewmodel.NavigationViewModel
 import com.example.appcorpalivconecta_grupo15.viewmodel.UsuarioViewModel
+import com.example.appcorpalivconecta_grupo15.viewmodel.EstadoViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,10 +75,10 @@ fun AppNavigation(
         initialValue = DrawerValue.Closed
     )
 
-    // Corrutinas para controlar el menu
+    // Permite abrir y cerrar el menu
     val scope = rememberCoroutineScope()
 
-    // Escuchamos los eventos de navegacion
+    // Procesamos los eventos del ViewModel de navegacion
     LaunchedEffect(navController, navigationViewModel) {
 
         navigationViewModel.navigationEvents.collect { event ->
@@ -96,6 +101,7 @@ fun AppNavigation(
     // Menu lateral principal
     ModalNavigationDrawer(
         drawerState = drawerState,
+
         drawerContent = {
 
             ModalDrawerSheet {
@@ -109,13 +115,14 @@ fun AppNavigation(
 
                 HorizontalDivider()
 
-                // Opcion Inicio
+                // Guia 10: Inicio
                 NavigationDrawerItem(
                     label = {
                         Text("Inicio")
                     },
                     selected = currentRoute == Screen.Home.route,
                     onClick = {
+
                         navigationViewModel.navigateTo(
                             Screen.Home.route
                         )
@@ -132,13 +139,14 @@ fun AppNavigation(
                     }
                 )
 
-                // Opcion Configuracion
+                // Guia 10: Configuracion
                 NavigationDrawerItem(
                     label = {
                         Text("Configuración")
                     },
                     selected = currentRoute == Screen.Settings.route,
                     onClick = {
+
                         navigationViewModel.navigateTo(
                             Screen.Settings.route
                         )
@@ -155,13 +163,14 @@ fun AppNavigation(
                     }
                 )
 
-                // Opcion Detalle
+                // Guia 10: Detalle
                 NavigationDrawerItem(
                     label = {
                         Text("Detalle")
                     },
                     selected = currentRoute == Screen.Detail.route,
                     onClick = {
+
                         navigationViewModel.navigateTo(
                             Screen.Detail.createRoute("15")
                         )
@@ -182,13 +191,14 @@ fun AppNavigation(
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
 
-                // Guia 11: Acceso al formulario de registro
+                // Guia 11: Registro de usuario
                 NavigationDrawerItem(
                     label = {
                         Text("Registro de usuario")
                     },
                     selected = currentRoute == Screen.Registro.route,
                     onClick = {
+
                         navigationViewModel.navigateTo(
                             Screen.Registro.route
                         )
@@ -204,21 +214,51 @@ fun AppNavigation(
                         )
                     }
                 )
+
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+
+                // Guia 12: Modo especial
+                NavigationDrawerItem(
+                    label = {
+                        Text("Modo especial")
+                    },
+                    selected = currentRoute == Screen.Estado.route,
+                    onClick = {
+
+                        navigationViewModel.navigateTo(
+                            Screen.Estado.route
+                        )
+
+                        scope.launch {
+                            drawerState.close()
+                        }
+                    },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = null
+                        )
+                    }
+                )
             }
         }
     ) {
 
-        // Estructura principal de CORPALIV Conecta
+        // Estructura principal
         Scaffold(
 
             // Barra superior global
             topBar = {
+
                 TopAppBar(
                     title = {
                         Text("CORPALIV Conecta")
                     },
 
                     navigationIcon = {
+
                         IconButton(
                             onClick = {
                                 scope.launch {
@@ -226,6 +266,7 @@ fun AppNavigation(
                                 }
                             }
                         ) {
+
                             Icon(
                                 imageVector = Icons.Default.Menu,
                                 contentDescription = "Abrir menú lateral"
@@ -237,6 +278,7 @@ fun AppNavigation(
 
             // Barra inferior de la Guia 10
             bottomBar = {
+
                 AppBottomBar(
                     currentRoute = currentRoute,
                     onNavigate = { route ->
@@ -247,24 +289,24 @@ fun AppNavigation(
 
         ) { innerPadding ->
 
-            // Contenedor de todas las pantallas
+            // Contenedor de las pantallas
             NavHost(
                 navController = navController,
                 startDestination = Screen.Home.route,
                 modifier = Modifier.padding(innerPadding)
             ) {
 
-                // Pantalla principal adaptable
+                // Guia 9: Inicio adaptable
                 composable(Screen.Home.route) {
                     HomeScreen2()
                 }
 
-                // Pantalla de configuracion
+                // Guia 10: Configuracion
                 composable(Screen.Settings.route) {
                     SettingsScreen()
                 }
 
-                // Pantalla de detalle con identificador
+                // Guia 10: Detalle con identificador
                 composable(
                     route = Screen.Detail.route,
                     arguments = listOf(
@@ -298,7 +340,7 @@ fun AppNavigation(
                     )
                 }
 
-                // Guia 11: Pantalla de resumen
+                // Guia 11: Resumen del formulario
                 composable(Screen.Resumen.route) {
 
                     ResumenScreen(
@@ -306,6 +348,16 @@ fun AppNavigation(
                         onVolver = {
                             navigationViewModel.popBackStack()
                         }
+                    )
+                }
+
+                // Guia 12: Estados y animaciones
+                composable(Screen.Estado.route) {
+
+                    val estadoViewModel: EstadoViewModel = viewModel()
+
+                    EstadoScreen(
+                        estadoViewModel = estadoViewModel
                     )
                 }
             }

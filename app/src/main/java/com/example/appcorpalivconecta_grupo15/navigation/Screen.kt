@@ -21,4 +21,10 @@ sealed class Screen(val route: String) {
 
     // Guía 11: Resumen de los datos
     data object Resumen : Screen("resumen")
+
+
+    // Guía 12: Pantalla de estados y animaciones
+    data object Estado : Screen("estado")
+
+
 }
