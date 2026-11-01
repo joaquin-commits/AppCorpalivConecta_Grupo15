@@ -50,6 +50,21 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
 
 
+
+    // Guía 12: Persistencia local de estados
+    implementation("androidx.datastore:datastore-preferences:1.1.7")
+
+    // Guía 12: Animaciones con Jetpack Compose
+    implementation("androidx.compose.animation:animation")
+
+    // Guía 12: Integración de estados con ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
+
+
+
+
+
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)

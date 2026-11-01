@@ -1,298 +1,118 @@
 package com.example.appcorpalivconecta_grupo15.navigation
 
-// Funciones de Jetpack Compose
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-
-import androidx.compose.runtime.getValue
-import androidx.navigation.compose.currentBackStackEntryAsState
-
-
-// Componentes visuales de Material 3
-import androidx.compose.material3.*
-
-// Íconos para los menús
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Menu
-
-// Herramientas para organizar la interfaz
-import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-
-// Navegación entre pantallas
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-
-// ViewModel
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.*
+import com.example.appcorpalivconecta_grupo15.model.Ficha
+import com.example.appcorpalivconecta_grupo15.ui.screens.*
+import com.example.appcorpalivconecta_grupo15.viewmodel.ColaboracionViewModel
 
-// Pantallas de CORPALIV Conecta
-import com.example.appcorpalivconecta_grupo15.ui.screens.HomeScreen2
-import com.example.appcorpalivconecta_grupo15.ui.screens.SettingsScreen
-import com.example.appcorpalivconecta_grupo15.ui.screens.DetailScreen
-
-// ViewModel de navegación
-import com.example.appcorpalivconecta_grupo15.viewmodel.NavigationViewModel
-
-
-
-import androidx.compose.runtime.rememberCoroutineScope
-import kotlinx.coroutines.launch
-
-
-
-
-
+/** Abre páginas verificadas o el cliente de correo. Las postulaciones y donaciones
+ * se realizan únicamente en plataformas institucionales externas, nunca en la app. */
+private fun abrirEnSistema(context: android.content.Context, destino: String) {
+    try {
+        val uri = Uri.parse(destino)
+        val intent = if (uri.scheme == "mailto") Intent(Intent.ACTION_SENDTO, uri)
+                     else Intent(Intent.ACTION_VIEW, uri)
+        context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    } catch (_: ActivityNotFoundException) {
+        Toast.makeText(context, "No se encontró una aplicación para abrir el enlace", Toast.LENGTH_LONG).show()
+    } catch (_: SecurityException) {
+        Toast.makeText(context, "El dispositivo bloqueó el acceso al enlace", Toast.LENGTH_LONG).show()
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppNavigation(
-    navigationViewModel: NavigationViewModel = viewModel()
-) {
-    // Controlador principal
-    val navController = rememberNavController()
+fun AppNavigation(vm: ColaboracionViewModel = viewModel()) {
+    val nav = rememberNavController()
+    val context = LocalContext.current
+    val entry by nav.currentBackStackEntryAsState()
+    val route = entry?.destination?.route ?: "inicio"
+    val pestañas = listOf("inicio", "programas", "catalogo", "historial")
+    val mostrarBarra = route in pestañas
 
-    // Pantalla actualmente seleccionada
-    val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = backStackEntry?.destination?.route
-
-    // Estado del menú lateral
-    val drawerState = rememberDrawerState(
-        initialValue = DrawerValue.Closed
-    )
-
-    // Permite abrir y cerrar el menú
-    val scope = rememberCoroutineScope()
-
-    // Procesamos los eventos del ViewModel
-    LaunchedEffect(navController, navigationViewModel) {
-        navigationViewModel.navigationEvents.collect { event ->
-            when (event) {
-                is NavigationEvent.NavigateTo -> {
-                    navController.navigate(event.route) {
-                        launchSingleTop = true
-                    }
-                }
-
-                NavigationEvent.PopBackStack -> {
-                    navController.popBackStack()
-                }
+    fun ir(ruta: String) {
+        // Una colaboración genérica no debe arrastrar el contexto de otra consulta.
+        if (ruta == "colaborar" && route != "detalle/{grupo}/{id}") vm.nuevo()
+        if (ruta in pestañas) {
+            nav.navigate(ruta) {
+                launchSingleTop = true
+                popUpTo("inicio") { saveState = true }
+                restoreState = true
             }
-        }
+        } else nav.navigate(ruta) { launchSingleTop = true }
     }
-
-    // Menú lateral de la aplicación
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet {
-
-                Text(
-                    text = "CORPALIV Conecta",
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(24.dp)
-                )
-
-                HorizontalDivider()
-
-                NavigationDrawerItem(
-                    label = { Text("Inicio") },
-                    selected = currentRoute == Screen.Home.route,
-                    onClick = {
-                        navigationViewModel.navigateTo(Screen.Home.route)
-                        scope.launch {
-                            drawerState.close()
-                        }
-                    },
-                    icon = {
-                        Icon(Icons.Default.Home, contentDescription = null)
+    fun volver() { if (!nav.popBackStack()) ir("inicio") }
+    fun consulta(f: Ficha) {
+        vm.prepararConsulta(f.titulo, f.tipoFormulario)
+        ir("colaborar")
+    }
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text("CORPALIV Conecta", style = MaterialTheme.typography.titleLarge) },
+                navigationIcon = {
+                    if (!mostrarBarra) IconButton(onClick = ::volver) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver a la pantalla anterior")
                     }
-                )
-
-                NavigationDrawerItem(
-                    label = { Text("Configuración") },
-                    selected = currentRoute == Screen.Settings.route,
-                    onClick = {
-                        navigationViewModel.navigateTo(Screen.Settings.route)
-                        scope.launch {
-                            drawerState.close()
-                        }
-                    },
-                    icon = {
-                        Icon(Icons.Default.Settings, contentDescription = null)
-                    }
-                )
-
-                NavigationDrawerItem(
-                    label = { Text("Detalle") },
-                    selected = currentRoute?.startsWith("detail_page/") == true,
-                    onClick = {
-                        navigationViewModel.navigateTo(
-                            Screen.Detail.createRoute("15")
-                        )
-                        scope.launch {
-                            drawerState.close()
-                        }
-                    },
-                    icon = {
-                        Icon(Icons.Default.Menu, contentDescription = null)
-                    }
-                )
-            }
-        }
-    ) {
-
-        // Estructura principal
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = {
-                        Text("CORPALIV Conecta")
-                    },
-                    navigationIcon = {
-                        IconButton(
-                            onClick = {
-                                scope.launch {
-                                    drawerState.open()
-                                }
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Menu,
-                                contentDescription = "Abrir menú"
-                            )
-                        }
-                    }
-                )
-            },
-            bottomBar = {
-                AppBottomBar(
-                    currentRoute = currentRoute,
-                    onNavigate = { route ->
-                        navigationViewModel.navigateTo(route)
-                    }
-                )
-            }
-        ) { innerPadding ->
-
-            // Contenedor de las pantallas
-            NavHost(
-                navController = navController,
-                startDestination = Screen.Home.route,
-                modifier = Modifier.padding(innerPadding)
-            ) {
-
-                composable(Screen.Home.route) {
-                    HomeScreen2()
                 }
-
-                composable(Screen.Settings.route) {
-                    SettingsScreen()
-                }
-
-                composable(
-                    route = Screen.Detail.route,
-                    arguments = listOf(
-                        navArgument("itemId") {
-                            type = NavType.StringType
-                        }
-                    )
-                ) { entry ->
-
-                    val itemId =
-                        entry.arguments?.getString("itemId") ?: ""
-
-                    DetailScreen(
-                        itemId = itemId,
-                        onBack = {
-                            navigationViewModel.popBackStack()
-                        }
+            )
+        },
+        bottomBar = {
+            if (mostrarBarra) NavigationBar {
+                listOf(
+                    Triple("inicio", "Inicio", Icons.Default.Home),
+                    Triple("programas", "Programas", Icons.Default.Groups),
+                    Triple("catalogo", "Catálogo", Icons.Default.Store),
+                    Triple("historial", "Solicitudes", Icons.Default.History)
+                ).forEach { (r, label, icono) ->
+                    NavigationBarItem(
+                        selected = route == r,
+                        onClick = { ir(r) },
+                        icon = { Icon(icono, contentDescription = label) },
+                        label = { Text(label) }
                     )
                 }
             }
         }
+    ) { padding ->
+        NavHost(navController = nav, startDestination = "inicio", modifier = Modifier.padding(padding)) {
+            composable("inicio") { CorpalivHome(::ir) { url -> abrirEnSistema(context, url) } }
+            composable("programas") { ProgramasScreen { id -> ir("detalle/programa/$id") } }
+            composable("catalogo") { CatalogoScreen { id -> ir("detalle/catalogo/$id") } }
+            composable("detalle/{grupo}/{id}") { back ->
+                DetalleSocial(
+                    grupo = back.arguments?.getString("grupo") ?: "programa",
+                    id = back.arguments?.getString("id") ?: "",
+                    volver = ::volver,
+                    accionFormulario = ::consulta,
+                    abrirEnlace = { abrirEnSistema(context, it) }
+                )
+            }
+            composable("participar") {
+                ParticiparScreen(
+                    abrir = ::ir,
+                    web = { abrirEnSistema(context, it) }
+                )
+            }
+            composable("colaborar") { FormularioScreen(vm) { ir("confirmacion") } }
+            composable("confirmacion") { ConfirmacionScreen(vm, ::ir) }
+            composable("historial") { HistorialScreen(vm) {
+                vm.nuevo()
+                ir("colaborar")
+            } }
+        }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-@Composable
-fun AppBottomBar(
-    currentRoute: String?,
-    onNavigate: (String) -> Unit
-) {
-    NavigationBar {
-
-        // Opción Inicio
-        NavigationBarItem(
-            selected = currentRoute == Screen.Home.route,
-            onClick = {
-                onNavigate(Screen.Home.route)
-            },
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.Home,
-                    contentDescription = "Inicio"
-                )
-            },
-            label = { Text("Inicio") }
-        )
-
-        // Opción Configuración
-        NavigationBarItem(
-            selected = currentRoute == Screen.Settings.route,
-            onClick = {
-                onNavigate(Screen.Settings.route)
-            },
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.Settings,
-                    contentDescription = "Configuración"
-                )
-            },
-            label = { Text("Configuración") }
-        )
-
-        // Opción Detalle
-        NavigationBarItem(
-            selected = currentRoute?.startsWith("detail_page/") == true,
-            onClick = {
-                onNavigate(Screen.Detail.createRoute("15"))
-            },
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.Menu,
-                    contentDescription = "Detalle"
-                )
-            },
-            label = { Text("Detalle") }
-        )
-    }
-}
-
