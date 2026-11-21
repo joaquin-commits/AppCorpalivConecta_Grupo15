@@ -33,6 +33,7 @@ private fun abrirEnSistema(context: android.content.Context, destino: String) {
     }
 }
 
+// Organiza las rutas, la barra inferior y la comunicación entre pantallas.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppNavigation(vm: ColaboracionViewModel = viewModel()) {
@@ -40,9 +41,10 @@ fun AppNavigation(vm: ColaboracionViewModel = viewModel()) {
     val context = LocalContext.current
     val entry by nav.currentBackStackEntryAsState()
     val route = entry?.destination?.route ?: "inicio"
-    val pestañas = listOf("inicio", "programas", "catalogo", "historial")
+    val pestañas = listOf("inicio", "programas", "catalogo", "historial", "publicaciones")
     val mostrarBarra = route in pestañas
 
+    // Navega sin duplicar pestañas y limpia el contexto cuando corresponde.
     fun ir(ruta: String) {
         // Una colaboración genérica no debe arrastrar el contexto de otra consulta.
         if (ruta == "colaborar" && route != "detalle/{grupo}/{id}") vm.nuevo()
@@ -55,10 +57,12 @@ fun AppNavigation(vm: ColaboracionViewModel = viewModel()) {
         } else nav.navigate(ruta) { launchSingleTop = true }
     }
     fun volver() { if (!nav.popBackStack()) ir("inicio") }
+    // Prepara el formulario con los datos del módulo seleccionado.
     fun consulta(f: Ficha) {
         vm.prepararConsulta(f.titulo, f.tipoFormulario)
         ir("colaborar")
     }
+    // Mantiene la barra superior y las pestañas comunes en las pantallas principales.
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -76,7 +80,8 @@ fun AppNavigation(vm: ColaboracionViewModel = viewModel()) {
                     Triple("inicio", "Inicio", Icons.Default.Home),
                     Triple("programas", "Programas", Icons.Default.Groups),
                     Triple("catalogo", "Catálogo", Icons.Default.Store),
-                    Triple("historial", "Solicitudes", Icons.Default.History)
+                    Triple("historial", "Solicitudes", Icons.Default.History),
+                    Triple("publicaciones", "API REST", Icons.Default.Cloud)
                 ).forEach { (r, label, icono) ->
                     NavigationBarItem(
                         selected = route == r,
@@ -88,6 +93,7 @@ fun AppNavigation(vm: ColaboracionViewModel = viewModel()) {
             }
         }
     ) { padding ->
+        // Asocia cada ruta con su pantalla y conserva los parámetros de detalles.
         NavHost(navController = nav, startDestination = "inicio", modifier = Modifier.padding(padding)) {
             composable("inicio") { CorpalivHome(::ir) { url -> abrirEnSistema(context, url) } }
             composable("programas") { ProgramasScreen { id -> ir("detalle/programa/$id") } }
@@ -109,6 +115,8 @@ fun AppNavigation(vm: ColaboracionViewModel = viewModel()) {
             }
             composable("colaborar") { FormularioScreen(vm) { ir("confirmacion") } }
             composable("confirmacion") { ConfirmacionScreen(vm, ::ir) }
+            // Guía 14: Consumo de API REST con Retrofit.
+            composable("publicaciones") { PostScreen() }
             composable("historial") { HistorialScreen(vm) {
                 vm.nuevo()
                 ir("colaborar")

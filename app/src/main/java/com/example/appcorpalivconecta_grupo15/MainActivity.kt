@@ -11,6 +11,7 @@ import com.example.appcorpalivconecta_grupo15.navigation.AppNavigation
 // Tema visual de CORPALIV Conecta
 import com.example.appcorpalivconecta_grupo15.ui.theme.AppCorpalivConecta_Grupo15Theme
 
+// Actividad de entrada: aplica el tema institucional y carga la navegación principal.
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
