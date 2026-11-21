@@ -41,6 +41,11 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
 
+    // Guía 14: API REST con Retrofit + Gson + corrutinas
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+
     // Guía 9: Tamaños de ventana
     implementation("androidx.compose.material3:material3-window-size-class")
     // Guía 10: Navegación entre pantallas
