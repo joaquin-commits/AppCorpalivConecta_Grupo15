@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 
 import com.example.appcorpalivconecta_grupo15.viewmodel.UsuarioViewModel
 
+// Presenta los datos compartidos por el ViewModel sin exponer la contraseña.
 @Composable
 fun ResumenScreen(
     usuarioViewModel: UsuarioViewModel,

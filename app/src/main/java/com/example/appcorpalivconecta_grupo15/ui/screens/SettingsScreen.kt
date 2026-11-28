@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 // Tema de CORPALIV Conecta
 import com.example.appcorpalivconecta_grupo15.ui.theme.AppCorpalivConecta_Grupo15Theme
 
+// Pantalla informativa para agrupar opciones generales de la aplicación.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen() {

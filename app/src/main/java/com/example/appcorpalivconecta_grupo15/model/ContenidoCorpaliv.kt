@@ -4,7 +4,9 @@ package com.example.appcorpalivconecta_grupo15.model
  * Las fotos de personas no se distribuyen sin confirmación de autorización de uso.
  * Los precios publicados son referenciales y pueden cambiar en el sitio oficial.
  */
+// Distingue los módulos que abren un formulario de los que usan un enlace externo.
 enum class TipoAccion { FORMULARIO, ENLACE }
+// Modelo común para mostrar programas, productos y servicios con una acción propia.
 data class Ficha(
     val id: String,
     val titulo: String,
@@ -17,14 +19,17 @@ data class Ficha(
     val enlace: String,
     val precioReferencia: String = ""
 )
+// Datos básicos para presentar noticias y abrir su publicación oficial.
 data class Noticia(val titulo: String, val fecha: String, val resumen: String, val enlace: String)
 
+// Centraliza el contenido institucional, el catálogo y las noticias de la aplicación.
 object ContenidoCorpaliv {
     const val sitio = "https://corpaliv.cl/"
     const val alba = "https://albalab.corpaliv.cl/"
     const val donaciones = "https://corpaliv.donando.cl/"
     const val contacto = "mailto:comunicaciones@corpaliv.cl"
 
+    // Programas con información y opciones de participación según su naturaleza.
     val programas = listOf(
         Ficha("escuela", "Escuela Especial Jan Van Dijk", "Educación y acompañamiento especializado",
             "La Escuela Especial Jan Van Dijk fue creada en 2003 y ofrece educación especializada a niños, niñas y jóvenes con discapacidad múltiple. CORPALIV también promueve el trabajo conjunto con sus familias.",
@@ -43,6 +48,7 @@ object ContenidoCorpaliv {
             "Participación", "Colaborar", TipoAccion.FORMULARIO, "Alianza empresarial", "https://corpaliv.cl/para-empresas/")
     )
 
+    // Productos y servicios consultables; precios sujetos a confirmación oficial.
     val catalogo = listOf(
         Ficha("bolsa", "Bolsa Alba Lab", "Bolsa ecológica reutilizable",
             "Bolsa de algodón reutilizable y lavable, con identidad Alba Lab. Consulta disponibilidad y condiciones en la tienda oficial.",
@@ -73,6 +79,7 @@ object ContenidoCorpaliv {
             "Servicio", "Solicitar información", TipoAccion.FORMULARIO, "Consulta de servicio", "https://albalab.corpaliv.cl/servicios/")
     )
 
+    // Noticias verificadas para dar contexto sobre actividades y proyectos.
     val noticias = listOf(
         Noticia("Impulso Laboral: nuevo proyecto aprobado", "25/11/2025",
             "CORPALIV informó la aprobación de una iniciativa de formación laboral para personas con discapacidad múltiple.",
@@ -85,6 +92,7 @@ object ContenidoCorpaliv {
             "https://corpaliv.cl/jovenes-beneficiarios-de-albalab-reciben-diplomas-tras-ciclo-de-capacitaciones-en-duoc-uc/")
     )
 
+    // Recupera la ficha elegida para conservar su contexto en la pantalla de detalle.
     fun buscar(grupo: String, id: String): Ficha? =
         (if (grupo == "programa") programas else if (grupo == "catalogo") catalogo else emptyList()).firstOrNull { it.id == id }
 }

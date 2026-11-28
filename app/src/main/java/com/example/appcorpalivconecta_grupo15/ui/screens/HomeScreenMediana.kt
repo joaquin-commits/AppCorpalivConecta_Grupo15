@@ -29,6 +29,7 @@ import com.example.appcorpalivconecta_grupo15.R
 // Tema de la aplicación
 import com.example.appcorpalivconecta_grupo15.ui.theme.AppCorpalivConecta_Grupo15Theme
 
+// Vista de ejemplo con distribución horizontal para pantallas medianas.
 @Composable
 fun HomeScreenMediana() {
 

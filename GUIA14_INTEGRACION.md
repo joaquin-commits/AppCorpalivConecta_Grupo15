@@ -33,3 +33,6 @@ Descripción: "Se integró JSONPlaceholder mediante Retrofit con arquitectura MV
 
 ## Validación
 No se pudo ejecutar una compilación Android completa en este entorno porque no está disponible el SDK de Android ni el acceso a descargas de dependencias de Gradle. Realiza la sincronización, compilación y ejecución en Android Studio antes de marcar la actividad como validada.
+
+### Corrección de edición de publicaciones creadas
+Las publicaciones nuevas con IDs locales superiores a 100 pueden editarse dentro de la aplicación. Es una edición local, porque JSONPlaceholder no persiste POST ni admite PUT de estos registros simulados. La edición de publicaciones originales (IDs hasta 100) sigue enviando PUT a la API.

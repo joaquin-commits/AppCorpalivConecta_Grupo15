@@ -41,7 +41,7 @@ fun AppNavigation(vm: ColaboracionViewModel = viewModel()) {
     val context = LocalContext.current
     val entry by nav.currentBackStackEntryAsState()
     val route = entry?.destination?.route ?: "inicio"
-    val pestañas = listOf("inicio", "programas", "catalogo", "historial", "publicaciones")
+    val pestañas = listOf("inicio", "programas", "catalogo", "historial")
     val mostrarBarra = route in pestañas
 
     // Navega sin duplicar pestañas y limpia el contexto cuando corresponde.
@@ -80,8 +80,7 @@ fun AppNavigation(vm: ColaboracionViewModel = viewModel()) {
                     Triple("inicio", "Inicio", Icons.Default.Home),
                     Triple("programas", "Programas", Icons.Default.Groups),
                     Triple("catalogo", "Catálogo", Icons.Default.Store),
-                    Triple("historial", "Solicitudes", Icons.Default.History),
-                    Triple("publicaciones", "API REST", Icons.Default.Cloud)
+                    Triple("historial", "Solicitudes", Icons.Default.History)
                 ).forEach { (r, label, icono) ->
                     NavigationBarItem(
                         selected = route == r,
@@ -107,17 +106,19 @@ fun AppNavigation(vm: ColaboracionViewModel = viewModel()) {
                     abrirEnlace = { abrirEnSistema(context, it) }
                 )
             }
+            composable("aportes-uf") { AportesUfScreen(abrirEnlace = { abrirEnSistema(context, it) }) }
+            composable("sede-albalab") { SedeAlbaLabScreen() }
             composable("participar") {
                 ParticiparScreen(
                     abrir = ::ir,
                     web = { abrirEnSistema(context, it) }
                 )
             }
-            composable("colaborar") { FormularioScreen(vm) { ir("confirmacion") } }
+            composable("colaborar") { FormularioScreen(vm) { vm.nuevo(); nav.navigate("confirmacion") { popUpTo("colaborar") { inclusive = true } } } }
             composable("confirmacion") { ConfirmacionScreen(vm, ::ir) }
             // Guía 14: Consumo de API REST con Retrofit.
-            composable("publicaciones") { PostScreen() }
-            composable("historial") { HistorialScreen(vm) {
+
+            composable("historial") { HistorialScreen(vm, editar = { vm.prepararEdicion(it); nav.navigate("colaborar") }) {
                 vm.nuevo()
                 ir("colaborar")
             } }

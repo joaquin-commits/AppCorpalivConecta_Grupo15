@@ -3,6 +3,7 @@ package com.example.appcorpalivconecta_grupo15.model
 /** Validación pura, separada de Android y de la interfaz (guía 11). */
 object ValidacionSolicitud {
     private val correoBasico = Regex("^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$")
+    // Reúne los errores de campos obligatorios sin depender de componentes visuales.
     fun validar(form: FormState): Map<String, String> = buildMap {
         if (form.nombre.trim().length < 3) put("nombre", "Escribe tu nombre (al menos 3 caracteres)")
         if (!correoBasico.matches(form.correo.trim())) put("correo", "Ingresa un correo válido, por ejemplo ejemplo@correo.cl")

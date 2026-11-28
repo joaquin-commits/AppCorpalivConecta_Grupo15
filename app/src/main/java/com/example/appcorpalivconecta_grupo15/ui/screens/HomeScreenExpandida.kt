@@ -30,6 +30,7 @@ import com.example.appcorpalivconecta_grupo15.R
 // Tema visual de CORPALIV Conecta
 import com.example.appcorpalivconecta_grupo15.ui.theme.AppCorpalivConecta_Grupo15Theme
 
+// Vista de ejemplo con contenido e imagen distribuidos en pantalla amplia.
 @Composable
 fun HomeScreenExpandida() {
 

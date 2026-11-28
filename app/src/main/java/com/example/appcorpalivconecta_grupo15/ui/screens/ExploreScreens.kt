@@ -27,6 +27,7 @@ private val azul = Color(0xFF0865AC)
 private val turquesa = Color(0xFF079A91)
 private val naranja = Color(0xFFFFA614)
 
+// Selecciona un símbolo coherente con el programa, producto o servicio.
 private fun icono(f: Ficha): ImageVector = when (f.id) {
     "escuela" -> Icons.Default.School
     "taller" -> Icons.Default.Construction
@@ -62,6 +63,7 @@ fun RecursoVisual(ficha: Ficha, modifier: Modifier = Modifier, compacto: Boolean
     }
 }
 
+// Título y descripción reutilizables para páginas de exploración.
 @Composable
 private fun Encabezado(titulo: String, texto: String) {
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -72,6 +74,7 @@ private fun Encabezado(titulo: String, texto: String) {
     }
 }
 
+// Tarjeta de catálogo o programa que abre el detalle del elemento seleccionado.
 @Composable
 private fun FichaCard(ficha: Ficha, abrir: () -> Unit) {
     ElevatedCard(onClick = abrir, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp)) {
@@ -94,6 +97,7 @@ private fun FichaCard(ficha: Ficha, abrir: () -> Unit) {
     }
 }
 
+// Lista navegable de programas e iniciativas publicados por CORPALIV.
 @Composable
 fun ProgramasScreen(abrir: (String) -> Unit) {
     LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -103,6 +107,7 @@ fun ProgramasScreen(abrir: (String) -> Unit) {
     }
 }
 
+// Muestra productos y servicios de Alba Lab con sus referencias informativas.
 @Composable
 fun CatalogoScreen(abrir: (String) -> Unit) {
     LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -120,6 +125,7 @@ fun CatalogoScreen(abrir: (String) -> Unit) {
     }
 }
 
+// Advierte que el contenido está sujeto a la información oficial vigente.
 @Composable
 fun AvisoReferencia() {
     Surface(color = MaterialTheme.colorScheme.surfaceVariant, shape = RoundedCornerShape(14.dp)) {
@@ -131,6 +137,7 @@ fun AvisoReferencia() {
     }
 }
 
+// Detalle contextual con descripción y una acción principal adecuada al módulo.
 @Composable
 fun DetalleSocial(
     grupo: String,
@@ -139,6 +146,7 @@ fun DetalleSocial(
     accionFormulario: (Ficha) -> Unit,
     abrirEnlace: (String) -> Unit
 ) {
+    // Busca el contenido solicitado; si no existe, ofrece volver sin cerrar la app.
     val ficha = ContenidoCorpaliv.buscar(grupo, id)
     if (ficha == null) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -174,6 +182,7 @@ fun DetalleSocial(
             }
         }
         item {
+            // La acción abre el sitio oficial o prepara una consulta, según la ficha.
             Button(onClick = {
                 if (ficha.tipoAccion == TipoAccion.ENLACE) abrirEnlace(ficha.enlace)
                 else accionFormulario(ficha)

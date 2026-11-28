@@ -15,6 +15,7 @@ import org.junit.Assert.*
  */
 @RunWith(AndroidJUnit4::class)
 class ExampleInstrumentedTest {
+    // Comprueba en el dispositivo el identificador del paquete Android.
     @Test
     fun useAppContext() {
         // Context of the app under test.

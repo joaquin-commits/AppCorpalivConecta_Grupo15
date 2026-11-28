@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 
 import com.example.appcorpalivconecta_grupo15.viewmodel.EstadoViewModel
 
+// Pantalla demostrativa de estado persistente y retroalimentación animada.
 @Composable
 fun EstadoScreen(
     estadoViewModel: EstadoViewModel

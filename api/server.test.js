@@ -1,0 +1,15 @@
+const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');const os=require('node:os');const path=require('node:path');const {createServer}=require('./server');
+const sample={nombre:'Ana',correo:'ana@ejemplo.cl',tipo:'Donación',mensaje:'Mensaje de prueba'};
+test('CRUD HTTP real y persistencia',async t=>{const dir=fs.mkdtempSync(path.join(os.tmpdir(),'corpaliv-'));const file=path.join(dir,'db.json');const server=createServer(file);await new Promise(r=>server.listen(0,'127.0.0.1',r));t.after(()=>{server.close();fs.rmSync(dir,{recursive:true,force:true});});const base=`http://127.0.0.1:${server.address().port}/solicitudes`;const call=(m,id='',data)=>fetch(base+id,{method:m,headers:{'Content-Type':'application/json'},body:data===undefined?undefined:JSON.stringify(data)});let id;
+await t.test('GET vacío',async()=>assert.deepEqual(await (await call('GET')).json(),[]));
+await t.test('POST válido',async()=>{const r=await call('POST','',sample);assert.equal(r.status,201);id=(await r.json()).id;assert.equal(id,1);});
+await t.test('POST inválido',async()=>assert.equal((await call('POST','',{...sample,correo:'x'})).status,400));
+await t.test('GET persistido',async()=>{assert.equal((await (await call('GET')).json())[0].id,id);assert.equal(JSON.parse(fs.readFileSync(file)).items.length,1);});
+await t.test('PUT válido',async()=>{const r=await call('PUT','/'+id,{...sample,mensaje:'Mensaje modificado'});assert.equal(r.status,200);assert.equal((await r.json()).mensaje,'Mensaje modificado');});
+await t.test('PUT inexistente',async()=>assert.equal((await call('PUT','/99',sample)).status,404));
+await t.test('PUT inválido',async()=>assert.equal((await call('PUT','/'+id,{...sample,nombre:''})).status,400));
+await t.test('DELETE válido',async()=>assert.equal((await call('DELETE','/'+id)).status,204));
+await t.test('DELETE inexistente',async()=>assert.equal((await call('DELETE','/'+id)).status,404));
+await t.test('GET luego de borrar',async()=>assert.deepEqual(await (await call('GET')).json(),[]));
+await t.test('método inválido',async()=>assert.equal((await call('DELETE')).status,405));
+});

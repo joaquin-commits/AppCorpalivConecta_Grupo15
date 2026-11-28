@@ -30,21 +30,56 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.example.appcorpalivconecta_grupo15.viewmodel.ColaboracionViewModel
+import com.example.appcorpalivconecta_grupo15.model.Solicitud
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
+// Tipos disponibles para clasificar una solicitud de colaboración o consulta.
 private val opciones=listOf("Solicitar información", "Información de programa", "Consulta de producto", "Consulta de servicio", "Donación", "Voluntariado", "Alianza empresarial", "Capacitación")
 private val programas=listOf(Triple("Inclusión laboral","Preparación y acompañamiento para el empleo",Icons.Default.Work),Triple("Formación","Talleres y desarrollo de habilidades",Icons.Default.School),Triple("Alianzas y RSE","Vinculación entre organizaciones y empresas",Icons.Default.Handshake))
 private val catalogo=listOf("Productos de elaboración colaborativa" to "Consultar disponibilidad y precios", "Servicios de Alba Lab" to "Solicitar información sobre servicios", "Iniciativas con impacto social" to "Explorar oportunidades de colaboración")
 
-@Composable fun SectionCard(title:String,subtitle:String,icon:androidx.compose.ui.graphics.vector.ImageVector, onClick:(()->Unit)?=null){
- ElevatedCard(onClick={onClick?:{}},enabled=onClick!=null,modifier=Modifier.fillMaxWidth().padding(vertical=5.dp),shape=RoundedCornerShape(18.dp)) {
- Row(Modifier.padding(18.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(14.dp)){
- Icon(icon,contentDescription=null,tint=MaterialTheme.colorScheme.secondary,modifier=Modifier.size(32.dp));Column(Modifier.weight(1f)){Text(title,fontWeight=FontWeight.SemiBold);Text(subtitle,style=MaterialTheme.typography.bodySmall,color=Color.DarkGray)}
- if(onClick!=null) Icon(Icons.Default.ChevronRight,contentDescription=null)
- }
- }}
+// Tarjeta reutilizable: toda su superficie recibe los eventos táctiles.
+// Usamos Card + Modifier.clickable de forma explícita para evitar
+// depender de la sobrecarga clickable de ElevatedCard.
+@Composable
+fun SectionCard(
+    title: String,
+    subtitle: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    onClick: (() -> Unit)? = null
+) {
+    val accion = if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 5.dp)
+            .then(accion),
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.elevatedCardColors(),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 1.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(18.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Icon(icon, contentDescription = null,
+                tint = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier.size(32.dp))
+            Column(Modifier.weight(1f)) {
+                Text(title, fontWeight = FontWeight.SemiBold)
+                Text(subtitle, style = MaterialTheme.typography.bodySmall, color = Color.DarkGray)
+            }
+            if (onClick != null) {
+                Icon(Icons.Default.ChevronRight, contentDescription = "Abrir $title")
+            }
+        }
+    }
+}
+// Inicio institucional con navegación a programas, colaboración, impacto y noticias.
 @Composable
 fun CorpalivHome(go: (String) -> Unit, abrirWeb: (String) -> Unit) {
+    // Adapta el ancho del contenido y permite desplazamiento vertical.
     BoxWithConstraints(Modifier.fillMaxSize()) {
     val margen = if (maxWidth >= 600.dp) 28.dp else 16.dp
     LazyColumn(modifier = Modifier.fillMaxWidth().widthIn(max = 780.dp).align(Alignment.TopCenter),
@@ -109,7 +144,9 @@ fun CorpalivHome(go: (String) -> Unit, abrirWeb: (String) -> Unit) {
         item { Text("¿Cómo puedes participar?", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold) }
         item { SectionCard("Explorar programas", "Conoce iniciativas de la escuela y Alba Lab.", Icons.Default.Groups) { go("programas") } }
         item { SectionCard("Apoyar a Alba Lab", "Conoce productos elaborados y servicios inclusivos.", Icons.Default.Storefront) { go("catalogo") } }
-        item { SectionCard("Colaborar o crear una alianza", "Deja una solicitud de interés guardada en el teléfono.", Icons.Default.Handshake) { go("colaborar") } }
+        item { SectionCard("Colaborar o crear una alianza", "Deja una solicitud de interés guardada en la API académica.", Icons.Default.Handshake) { go("colaborar") } }
+        item { SectionCard("Calcular aporte en UF", "Consulta un indicador económico real y estima su equivalente en pesos.", Icons.Default.Calculate) { go("aportes-uf") } }
+        item { SectionCard("Sedes y red de apoyo", "Encuentra CORPALIV, Alba Lab y otros servicios de inclusión en Santiago.", Icons.Default.Place) { go("sede-albalab") } }
         item { SectionCard("Donar en el sitio oficial", "Abre la plataforma oficial de donaciones; no cobramos en la app.", Icons.Default.Favorite) {
             abrirWeb(com.example.appcorpalivconecta_grupo15.model.ContenidoCorpaliv.donaciones)
         } }
@@ -137,6 +174,7 @@ fun CorpalivHome(go: (String) -> Unit, abrirWeb: (String) -> Unit) {
       }
     }
 }
+// Tarjeta destacada que presenta las áreas de trabajo de CORPALIV.
 @Composable
 private fun PresentacionArea(titulo: String, descripcion: String, icono: androidx.compose.ui.graphics.vector.ImageVector,
     color: Color, abrir: () -> Unit) {
@@ -156,6 +194,7 @@ private fun PresentacionArea(titulo: String, descripcion: String, icono: android
     }
 }
 
+// Indicador visual reutilizable para datos institucionales publicados.
 @Composable
 private fun CajaImpacto(numero: String, descripcion: String, modifier: Modifier = Modifier) {
     Surface(modifier = modifier, shape = RoundedCornerShape(18.dp),
@@ -167,29 +206,35 @@ private fun CajaImpacto(numero: String, descripcion: String, modifier: Modifier 
         }
     }
 }
+// Formulario de interés con validaciones reactivas y recursos nativos opcionales.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable fun FormularioScreen(vm:ColaboracionViewModel,onSuccess:()->Unit){
  val state by vm.form.collectAsStateWithLifecycle()
+ val ocupado by vm.ocupado.collectAsStateWithLifecycle()
+ val errorApi by vm.error.collectAsStateWithLifecycle()
  val context=LocalContext.current
  var imagen by remember { mutableStateOf<android.graphics.Bitmap?>(null) }
+ // Abre la cámara y mantiene la imagen capturada solo en memoria de la pantalla.
  val camera=rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()){bitmap->imagen=bitmap}
+ // Consulta una ubicación disponible y comunica el resultado al ViewModel.
  fun obtenerUbicacion(){
   val locationManager=context.getSystemService(android.content.Context.LOCATION_SERVICE) as LocationManager
   try { val l=locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)?: locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
    vm.cambiar("ubicacion",if(l==null) "Ubicación no disponible (activa el GPS)" else "${"%.5f".format(java.util.Locale.US,l.latitude)}, ${"%.5f".format(java.util.Locale.US,l.longitude)}")
   }catch(_:SecurityException){vm.cambiar("ubicacion","Permiso de ubicación denegado")}
  }
+ // Solicita permisos de ubicación cuando todavía no fueron concedidos.
  val permission=rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){grants->if(grants.values.any{it})obtenerUbicacion()else vm.cambiar("ubicacion","Permiso de ubicación denegado")}
  LaunchedEffect(state.enviado){if(state.enviado)onSuccess()}
  LazyColumn(contentPadding=PaddingValues(18.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){
  item{Text(if(state.contexto.isBlank()) "Quiero colaborar" else "Solicitud de información",style=MaterialTheme.typography.headlineSmall,fontWeight=FontWeight.Bold)
- Text("Formulario de demostración. Tus datos se guardan solamente en este teléfono y NO se envían a CORPALIV.")}
+ Text("Formulario de demostración. Usa datos ficticios: se guardan en la API académica, no en CORPALIV.")}
  if(state.contexto.isNotBlank()) item {
   Surface(color=MaterialTheme.colorScheme.primaryContainer,shape=RoundedCornerShape(16.dp)) {
    Column(Modifier.fillMaxWidth().padding(14.dp)) {
     Text("Estás consultando",style=MaterialTheme.typography.labelMedium)
     Text(state.contexto,fontWeight=FontWeight.Bold)
-    Text("Conservaremos esta referencia en tu solicitud local.",style=MaterialTheme.typography.bodySmall)
+    Text("Conservaremos esta referencia en tu solicitud académica.",style=MaterialTheme.typography.bodySmall)
    }
   }
  }
@@ -205,30 +250,38 @@ private fun CajaImpacto(numero: String, descripcion: String, modifier: Modifier 
  item{AnimatedVisibility(imagen!=null){imagen?.let{Image(it.asImageBitmap(),contentDescription="Foto de prueba",modifier=Modifier.fillMaxWidth().height(170.dp))}}}
  item{OutlinedButton(onClick={if(ContextCompat.checkSelfPermission(context,Manifest.permission.ACCESS_COARSE_LOCATION)==PackageManager.PERMISSION_GRANTED) obtenerUbicacion() else permission.launch(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION))},modifier=Modifier.fillMaxWidth()){Icon(Icons.Default.LocationOn,null);Spacer(Modifier.width(8.dp));Text("Compartir ubicación (opcional)")}}
  item{if(state.ubicacion.isNotBlank())Text(state.ubicacion,style=MaterialTheme.typography.bodySmall)}
- item{Button(onClick={vm.enviar()},modifier=Modifier.fillMaxWidth()){Icon(Icons.Default.Send,null);Spacer(Modifier.width(8.dp));Text("Guardar solicitud")}}
- item{Text("Usa datos ficticios para esta evaluación. La foto se muestra sin guardarse. La ubicación, si la compartes, se guarda con la solicitud local.",style=MaterialTheme.typography.labelSmall,color=Color.Gray)}
+ item{errorApi?.let{Text(it,color=MaterialTheme.colorScheme.error)};if(ocupado) LinearProgressIndicator(Modifier.fillMaxWidth());Button(onClick={vm.enviar()},enabled=!ocupado,modifier=Modifier.fillMaxWidth()){Icon(Icons.Default.Send,null);Spacer(Modifier.width(8.dp));Text(if(state.id==0L) "Guardar solicitud" else "Actualizar solicitud")}}
+ item{Text("Usa datos ficticios para esta evaluación. La foto se muestra sin guardarse. La ubicación, si la compartes, se guarda con la solicitud académica.",style=MaterialTheme.typography.labelSmall,color=Color.Gray)}
  }
 }
+// Campo reutilizable con ícono y mensaje visual si hay un error.
 @Composable private fun Campo(titulo:String,valor:String,error:String?,icon:androidx.compose.ui.graphics.vector.ImageVector,keyboard:KeyboardType=KeyboardType.Text,cambio:(String)->Unit){
  OutlinedTextField(value=valor,onValueChange=cambio,label={Text(titulo)},leadingIcon={Icon(icon,contentDescription=titulo)},isError=error!=null,supportingText={if(error!=null)Text(error) else Text(" ")},keyboardOptions=KeyboardOptions(keyboardType=keyboard),modifier=Modifier.fillMaxWidth(),shape=RoundedCornerShape(14.dp),maxLines=if(titulo=="Mensaje")4 else 1)
 }
+// Confirma con una animación que la solicitud quedó guardada localmente.
 @Composable fun ConfirmacionScreen(vm:ColaboracionViewModel,go:(String)->Unit){
  var visible by remember { mutableStateOf(false) };LaunchedEffect(Unit){visible=true}
  Box(Modifier.fillMaxSize().padding(24.dp),contentAlignment=Alignment.Center){AnimatedVisibility(visible){Column(horizontalAlignment=Alignment.CenterHorizontally,verticalArrangement=Arrangement.spacedBy(16.dp)){
- Icon(Icons.Default.CheckCircle,contentDescription="Registro exitoso",tint=Color(0xFF159E77),modifier=Modifier.size(90.dp));Text("¡Gracias por tu interés!",style=MaterialTheme.typography.headlineSmall);Text("Tu solicitud quedó guardada en este dispositivo.");Button(onClick={vm.nuevo();go("historial")}){Text("Ver mis solicitudes")};TextButton(onClick={vm.nuevo();go("inicio")}){Text("Volver al inicio")}
+ Icon(Icons.Default.CheckCircle,contentDescription="Registro exitoso",tint=Color(0xFF159E77),modifier=Modifier.size(90.dp));Text("¡Gracias por tu interés!",style=MaterialTheme.typography.headlineSmall);Text("Tu solicitud quedó guardada en la API académica.");Button(onClick={vm.nuevo();go("historial")}){Text("Ver mis solicitudes")};TextButton(onClick={vm.nuevo();go("inicio")}){Text("Volver al inicio")}
  }}}
 }
-@Composable fun HistorialScreen(vm:ColaboracionViewModel,go:()->Unit){
+// Muestra solicitudes guardadas, estado vacío y eliminación con confirmación.
+@Composable fun HistorialScreen(vm:ColaboracionViewModel,editar: (Solicitud)->Unit = {},go:()->Unit){
  val registros by vm.solicitudes.collectAsStateWithLifecycle()
- var borrar by remember { mutableStateOf<Int?>(null) }
- if(borrar!=null) AlertDialog(onDismissRequest={borrar=null},title={Text("Eliminar solicitud")},text={Text("¿Deseas borrar este registro local? Esta acción no se puede deshacer.")},confirmButton={TextButton(onClick={borrar?.let(vm::eliminarSolicitud);borrar=null}){Text("Eliminar")}},dismissButton={TextButton(onClick={borrar=null}){Text("Cancelar")}})
+ val ocupado by vm.ocupado.collectAsStateWithLifecycle()
+ val errorApi by vm.error.collectAsStateWithLifecycle()
+ LaunchedEffect(Unit){vm.cargar()}
+ var borrar by remember { mutableStateOf<Long?>(null) }
+ if(borrar!=null) AlertDialog(onDismissRequest={borrar=null},title={Text("Eliminar solicitud")},text={Text("¿Deseas borrar este registro remoto? Esta acción no se puede deshacer.")},confirmButton={TextButton(onClick={borrar?.let(vm::eliminarSolicitud);borrar=null}){Text("Eliminar")}},dismissButton={TextButton(onClick={borrar=null}){Text("Cancelar")}})
  LazyColumn(contentPadding=PaddingValues(18.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){
-  item{Text("Mis solicitudes",style=MaterialTheme.typography.headlineSmall,fontWeight=FontWeight.Bold);Text("Historial guardado solo en este dispositivo")}
-  if(registros.isEmpty())item{Column(verticalArrangement=Arrangement.spacedBy(12.dp),horizontalAlignment=Alignment.CenterHorizontally,modifier=Modifier.fillMaxWidth().padding(30.dp)){Icon(Icons.Default.Inventory2,contentDescription=null,modifier=Modifier.size(70.dp),tint=MaterialTheme.colorScheme.primary);Text("Todavía no tienes solicitudes");Button(onClick=go){Text("Crear solicitud")}}}
+  item{Text("Mis solicitudes",style=MaterialTheme.typography.headlineSmall,fontWeight=FontWeight.Bold);Text("Historial de la API académica")}
+  item{if(ocupado) LinearProgressIndicator(Modifier.fillMaxWidth());errorApi?.let{Text(it,color=MaterialTheme.colorScheme.error)};TextButton(onClick=vm::cargar,enabled=!ocupado){Text("Actualizar historial")}}
+  if(registros.isEmpty() && !ocupado && errorApi==null)item{Column(verticalArrangement=Arrangement.spacedBy(12.dp),horizontalAlignment=Alignment.CenterHorizontally,modifier=Modifier.fillMaxWidth().padding(30.dp)){Icon(Icons.Default.Inventory2,contentDescription=null,modifier=Modifier.size(70.dp),tint=MaterialTheme.colorScheme.primary);Text("Todavía no tienes solicitudes");Button(onClick=go){Text("Crear solicitud")}}}
   items(registros.size){idx->val r=registros[idx]; ElevatedCard(Modifier.fillMaxWidth(),shape=RoundedCornerShape(18.dp)){Column(Modifier.padding(18.dp),verticalArrangement=Arrangement.spacedBy(6.dp)){
     Row(verticalAlignment=Alignment.CenterVertically){Text(r.tipo,fontWeight=FontWeight.Bold,modifier=Modifier.weight(1f));Icon(Icons.Default.CheckCircle,null,tint=Color(0xFF159E77))}
     Text("${r.nombre} · ${r.fecha}");if(r.contexto.isNotBlank()) Text("Consulta: ${r.contexto}",fontWeight=FontWeight.SemiBold);Text(r.correo,style=MaterialTheme.typography.bodySmall);Text(r.mensaje);if(r.organizacion.isNotBlank())Text("Organización: ${r.organizacion}",style=MaterialTheme.typography.bodySmall);if(r.ubicacion.isNotBlank())Text("Ubicación compartida: ${r.ubicacion}",style=MaterialTheme.typography.bodySmall)
-    TextButton(onClick={borrar=idx},modifier=Modifier.align(Alignment.End)){Icon(Icons.Default.DeleteOutline,null);Spacer(Modifier.width(6.dp));Text("Eliminar registro")}
+    TextButton(onClick={editar(r)},enabled=!ocupado){Text("Editar solicitud")}
+    TextButton(onClick={borrar=r.id},enabled=!ocupado,modifier=Modifier.align(Alignment.End)){Icon(Icons.Default.DeleteOutline,null);Spacer(Modifier.width(6.dp));Text("Eliminar registro")}
   }}}
   if(registros.isNotEmpty()) item {OutlinedButton(onClick=go,modifier=Modifier.fillMaxWidth()){Icon(Icons.Default.Add,null);Spacer(Modifier.width(8.dp));Text("Crear solicitud")}}
  }

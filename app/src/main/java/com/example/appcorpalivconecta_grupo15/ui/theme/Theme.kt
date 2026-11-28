@@ -21,6 +21,7 @@ private val coloresInstitucionales = lightColorScheme(
     onSurfaceVariant = Color(0xFF405569)
 )
 
+// Aplica la paleta institucional a las pantallas mediante Material 3.
 @Composable
 fun AppCorpalivConecta_Grupo15Theme(content: @Composable () -> Unit) {
     MaterialTheme(colorScheme = coloresInstitucionales, content = content)

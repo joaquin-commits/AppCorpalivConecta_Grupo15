@@ -34,6 +34,7 @@ import com.example.appcorpalivconecta_grupo15.R
 @OptIn(ExperimentalMaterial3Api::class)
 
 // Indica que esta función construye una interfaz
+// Pantalla de ejemplo de Compose conservada como referencia de componentes básicos.
 @Composable
 fun HomeScreen() {
 

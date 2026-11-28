@@ -4,6 +4,7 @@ import com.example.appcorpalivconecta_grupo15.model.*
 import org.junit.Assert.*
 import org.junit.Test
 
+// Pruebas unitarias para campos obligatorios y búsqueda de contenidos.
 class ValidacionSolicitudTest {
     private fun valido() = FormState(
         nombre = "Persona de prueba", correo = "prueba@ejemplo.cl",

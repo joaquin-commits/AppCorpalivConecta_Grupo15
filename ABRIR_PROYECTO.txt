@@ -1,0 +1,6 @@
+1. Extraer el ZIP completo, por ejemplo en C:\Proyectos.
+2. En Android Studio: File > Open y elegir la carpeta CORPALIV_Conecta (contiene settings.gradle.kts).
+3. Usar el SDK local de Android Studio e instalar Android SDK Platform 37 si se solicita.
+4. Sincronizar Gradle con Internet. Si falta local.properties, crearlo con la ruta real del SDK de tu PC.
+5. Elegir un emulador y ejecutar app.
+Se conservaron las versiones originales de Gradle y dependencias.

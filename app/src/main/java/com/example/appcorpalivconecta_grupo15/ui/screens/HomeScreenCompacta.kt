@@ -28,6 +28,7 @@ import com.example.appcorpalivconecta_grupo15.R
 // Tema visual de CORPALIV Conecta
 import com.example.appcorpalivconecta_grupo15.ui.theme.AppCorpalivConecta_Grupo15Theme
 
+// Vista de ejemplo de la guía de adaptabilidad para pantallas compactas.
 @Composable
 fun HomeScreenCompacta() {
 

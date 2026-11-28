@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.appcorpalivconecta_grupo15.viewmodel.UsuarioViewModel
 import com.example.appcorpalivconecta_grupo15.ui.theme.AppCorpalivConecta_Grupo15Theme
 
+// Pantalla de registro de la guía: observa el estado y muestra validaciones por campo.
 @Composable
 fun RegistroScreen(
     usuarioViewModel: UsuarioViewModel,
